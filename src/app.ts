@@ -1,18 +1,22 @@
-import { PrismaClient } from "@prisma/client";
-import express, { Request, Response } from "express";
+  import { PrismaClient } from "@prisma/client";
+  import express from "express";
+  import authRouter  from "./routes/auth.route";
+  import morgan from 'morgan';
 
-const app = express();
-app.use(express.json());
 
-const prisma = new PrismaClient();
+  const app = express();
+  app.use(morgan('dev')); 
 
-app.get("/users", async (req: Request, res: Response)=>{
-    const users = await prisma.user.findFirst({
-        where: {email: "reachmohdaltaf@gmail.com"}
-    })
-    res.json(users)
-})
+  app.use(express.json());
+  const prisma = new PrismaClient();
 
-app.listen(4000, () => {
-  console.log("Listening on port 4000");
-});
+
+  app.use("/api/auth", authRouter)
+
+
+     
+
+
+  app.listen(4000, () => {
+    console.log("Listening on port 4000");
+  });

@@ -13,8 +13,49 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user{
-  id Int @id @default(autoincrement())
-  name String 
-  email String @unique
+enum Role{
+  USER
+  HOST
 }
+
+// enum BookingStatus{
+//   PENDING
+//   CONFIRMED
+//   CANCELLED
+// }
+
+// enum PaymentStatus{
+//   PENDING
+//   COMPLETED
+//   FAILED
+// }
+model User{
+  id String @id @default(cuid())
+  name String?
+  email String @unique
+  provider String
+  providerId String
+  picture String?
+  accessToken String?
+  refreshToken String?
+  tokenExpiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// model Property{
+//   id Int @id @default(autoincrement())
+// }
+
+// model Booking{
+//   id Int @id @default(autoincrement())
+// }
+
+// model Payment{
+//   id Int @id @default(autoincrement())
+// }
+
+// model Amenity{
+//   id Int @id @default(autoincrement())
+// }
+
