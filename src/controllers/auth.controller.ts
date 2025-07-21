@@ -8,57 +8,48 @@ export const loginWithProvider = async (req: Request, res: Response) => {
     picture,
     provider,
     providerId,
-    accessToken,
     refreshToken,
     tokenExpiresAt,
-  } = req.body;
+  } = req.body
+
+  if(!name || !email  ) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
 
   try {
-    // Check if user exists
     let user = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
-
-    if (user) {
-      // User exists, optionally update tokens
+      where:{
+        email
+      }
+    })
+    if(user){
       await prisma.user.update({
-        where: { email },
-        data: {
-          accessToken,
-          refreshToken,
-          tokenExpiresAt: new Date(tokenExpiresAt),
-          updatedAt: new Date(),
+        where: {
+          email
         },
-      });
-
-      return res.status(200).json({
-        message: "User already exists and logged in",
-        user,
-      });
+        data: {
+          refreshToken,
+          tokenExpiresAt: tokenExpiresAt ? new Date(tokenExpiresAt) : undefined,
+          updatedAt: new Date()
+        }
+      })
+    }else{
+      user = await prisma.user.create({
+        data: {
+          name,
+          email,
+          picture,
+          provider,
+          providerId,
+          refreshToken,
+          tokenExpiresAt: tokenExpiresAt ? new Date(tokenExpiresAt) : undefined
+        }
+      })
     }
 
-    // If user doesn't exist, create one
-    user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        picture,
-        provider,
-        providerId,
-        accessToken,
-        refreshToken,
-        tokenExpiresAt: new Date(tokenExpiresAt),
-      },
-    });
-
-    return res.status(201).json({
-      message: "User created and logged in",
-      user,
-    });
+    return res.status(200).json(user);
   } catch (error) {
-    console.error("Login error:", error);
-    return res.status(500).json({ message: "Something went wrong" });
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
   }
-};
+}
