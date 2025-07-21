@@ -2,10 +2,14 @@
   import express from "express";
   import authRouter  from "./routes/auth.route";
   import morgan from 'morgan';
-
+  import cors from 'cors'
 
   const app = express();
-  app.use(morgan('dev')); 
+  app.use(morgan('dev'));
+  app.use(cors({
+    origin: '*',
+    credentials: true
+  })); 
 
   app.use(express.json());
   const prisma = new PrismaClient();
